@@ -1,49 +1,85 @@
 import { StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import ColorCounter from '../components/ColorCounter';
 
 const COLOR_INCREMENT = 15;
 
-const SquareScreen = () => {
-  const [red, setRed] = useState(0);
-  const [blue, setBlue] = useState(0);
-  const [green, setGreen] = useState(0);
+const colorReducer = (state, action) => {
+  // state === { red: number, green: number, blue: number }
+  // action === { type: 'set_red' || 'set_green' || 'set_blue', payload: 15 || -15 }
 
-  const setColor = (color, change) => {
-    switch (color) {
-      case 'red':
-        red + change > 255 || red + change < 0 ? null : setRed(red + change);
-        return;
-      case 'green':
-        green + change > 255 || green + change < 0
-          ? null
-          : setGreen(green + change);
-        return;
-      case 'blue':
-        blue + change > 255 || blue + change < 0
-          ? null
-          : setBlue(blue + change);
-        return;
-      default:
-        return;
-    }
-  };
+  switch (action.type) {
+    case 'set_red':
+      return state.red + action.payload > 255 || state.red + action.payload < 0
+        ? state
+        : { ...state, red: state.red + action.payload };
+    case 'set_green':
+      return state.green + action.payload > 255 ||
+        state.green + action.payload < 0
+        ? state
+        : { ...state, green: state.green + action.payload };
+    case 'set_blue':
+      return state.blue + action.payload > 255 ||
+        state.blue + action.payload < 0
+        ? state
+        : { ...state, blue: state.blue + action.payload };
+    default:
+      return state;
+  }
+};
+
+const SquareScreen = () => {
+  const [{ red, green, blue }, dispatch] = useReducer(colorReducer, {
+    red: 0,
+    green: 0,
+    blue: 0,
+  });
 
   return (
     <View>
       <ColorCounter
-        onIncrease={() => setColor('red', COLOR_INCREMENT)}
-        onDecrease={() => setColor('red', -COLOR_INCREMENT)}
+        onIncrease={() =>
+          dispatch({
+            type: 'set_red',
+            payload: COLOR_INCREMENT,
+          })
+        }
+        onDecrease={() =>
+          dispatch({
+            type: 'set_red',
+            payload: -COLOR_INCREMENT,
+          })
+        }
         color='Red'
       />
       <ColorCounter
-        onIncrease={() => setColor('blue', COLOR_INCREMENT)}
-        onDecrease={() => setColor('blue', -COLOR_INCREMENT)}
+        onIncrease={() =>
+          dispatch({
+            type: 'set_blue',
+            payload: COLOR_INCREMENT,
+          })
+        }
+        onDecrease={() =>
+          dispatch({
+            type: 'set_blue',
+            payload: -COLOR_INCREMENT,
+          })
+        }
         color='Blue'
       />
       <ColorCounter
-        onIncrease={() => setColor('green', COLOR_INCREMENT)}
-        onDecrease={() => setColor('green', -COLOR_INCREMENT)}
+        onIncrease={() =>
+          dispatch({
+            type: 'set_green',
+            payload: COLOR_INCREMENT,
+          })
+        }
+        onDecrease={() =>
+          dispatch({
+            type: 'set_green',
+            payload: -COLOR_INCREMENT,
+          })
+        }
         color='Green'
       />
 
